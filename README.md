@@ -3,6 +3,7 @@ Generated transaction hex may be later broadcast via online services (e.g. [Bloc
 
 ## What's Supported
 * `SIGHASH_ALL` signature type only
+* `P2PKH` transaction type only
 * Multiple inputs from different addresses (signed with different keys)
 * Multiple outputs
 * Regular and compressed addresses
