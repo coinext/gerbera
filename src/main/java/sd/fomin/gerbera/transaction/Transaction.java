@@ -2,7 +2,7 @@ package sd.fomin.gerbera.transaction;
 
 public class Transaction {
 
-    private static final String ALIGN_FORMAT = "%-20s";
+    private static final String ALIGN_FORMAT = "%-25s";
 
     private StringBuilder raw = new StringBuilder();
 

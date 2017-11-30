@@ -82,28 +82,28 @@ transaction.getSplitTransaction()
 
 Result example:
 ```
-Version             01000000
-Input count         01
-Input #1
-   Transaction out  703500a38144718cbbe237da3543c00e0b47683c554ef3da87c110a3a5cd34e0
-   Tout index       02000000
-   Unlock length    8b
-   Unlock           483045022100c492d67d7e0344e8e34acabcb37a8f39ee78ac2cc6c3ce8a988bc90208231bae02203bcdc8811cdc8d50debdbe40614021578d245d0ada475b765c12e639f7cceeb7014104df661fe5f879a80bf362a13e6d50de70fda2eddca7d0643641d08f80c162669984547d59eb68c1dfd911e8ef64a9f2f9c8ccfe0ae206845c84c2df581ad51ca1
-   Sequence         ffffffff
-Output count        03
-Output #1 (Custom)
-   Satoshi          a406000000000000
-   Lock length      19
-   Lock             76a914352c32a2b6ee5aa173334b6df32edd4117489a9a88ac
-Output #2 (Custom)
-   Satoshi          d007000000000000
-   Lock length      19
-   Lock             76a914b5d66995560fb4ea489c6d70e733537288f0cdcd88ac
-Output #3 (Change)
-   Satoshi          e803000000000000
-   Lock length      19
-   Lock             76a91444aeddf5d5f4f8fccf68ecd8e83242f6cfb6b9fa88ac
-Locktime            00000000
+Version                  01000000
+Input count              01
+   Input
+      Transaction out    703500a38144718cbbe237da3543c00e0b47683c554ef3da87c110a3a5cd34e0
+      Tout index         02000000
+      Unlock length      8b
+      Unlock             483045022100e635b1c21dff127156f954a610062b2880d2f3a1752017eadeb277a773e4e93b022011b4cec19ce81c7cc25ed5068d8428e2bfc7eac32543dc825cb12368bdd5d516014104df661fe5f879a80bf362a13e6d50de70fda2eddca7d0643641d08f80c162669984547d59eb68c1dfd911e8ef64a9f2f9c8ccfe0ae206845c84c2df581ad51ca1
+      Sequence           ffffffff
+Output count             03
+   Output (Custom)
+      Satoshi            a406000000000000
+      Lock length        19
+      Lock               76a914352c32a2b6ee5aa173334b6df32edd4117489a9a88ac
+   Output (Custom)
+      Satoshi            d007000000000000
+      Lock length        19
+      Lock               76a914b5d66995560fb4ea489c6d70e733537288f0cdcd88ac
+   Output (Change)
+      Satoshi            e803000000000000
+      Lock length        19
+      Lock               76a91444aeddf5d5f4f8fccf68ecd8e83242f6cfb6b9fa88ac
+Locktime                 00000000
 ```
 
 ## How to compile

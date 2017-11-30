@@ -75,16 +75,12 @@ public class TransactionBuilder {
 
         transaction.addLine("Input count", VarInt.of(inputs.size()).toString());
         for (int i = 0; i < inputs.size(); i++) {
-            transaction.addLine("Input #" + (i + 1));
             byte[] signBase = getSignBase(i);
             inputs.get(i).fillTransaction(signBase, transaction);
         }
 
         transaction.addLine("Output count", VarInt.of(outputs.size()).toString());
-        for (int i = 0; i < outputs.size(); i++) {
-            transaction.addLine("Output #" + (i + 1) + " (" + outputs.get(i).getType().getDesc() + ")");
-            outputs.get(i).fillTransaction(transaction);
-        }
+        outputs.forEach(output -> output.fillTransaction(transaction));
 
         transaction.addLine("Locktime", LOCK_TIME.toString());
 

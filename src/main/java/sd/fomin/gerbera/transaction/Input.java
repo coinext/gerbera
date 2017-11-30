@@ -87,13 +87,14 @@ class Input {
     }
 
     void fillTransaction(byte[] signBase, Transaction transaction) {
-        byte[] unlocking = unlocking(signBase);
+        transaction.addLine("   Input");
 
-        transaction.addLine("   Transaction out", HexUtils.asString(outputTransactionHash));
-        transaction.addLine("   Tout index", outputIndex.toString());
-        transaction.addLine("   Unlock length", HexUtils.asString(VarInt.of(unlocking.length).asLitEndBytes()));
-        transaction.addLine("   Unlock", HexUtils.asString(unlocking));
-        transaction.addLine("   Sequence", SEQUENCE.toString());
+        byte[] unlocking = unlocking(signBase);
+        transaction.addLine("      Transaction out", HexUtils.asString(outputTransactionHash));
+        transaction.addLine("      Tout index", outputIndex.toString());
+        transaction.addLine("      Unlock length", HexUtils.asString(VarInt.of(unlocking.length).asLitEndBytes()));
+        transaction.addLine("      Unlock", HexUtils.asString(unlocking));
+        transaction.addLine("      Sequence", SEQUENCE.toString());
     }
 
     boolean hasPrivateKey() {
