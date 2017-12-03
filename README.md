@@ -106,6 +106,20 @@ Output count             03
 Locktime                 00000000
 ```
 
+### Get additional transaction information
+To get additional transaction info (size in bytes and satoshi/byte fee) call the following method of the `transaction` object:
+```java
+transaction.getTransactionInfo()
+``` 
+
+Result example:
+```
+Size (bytes):
+  291
+Fee (satoshi/byte):
+  1.031
+```
+
 ## How to compile
 First clone the project:
 ```sh

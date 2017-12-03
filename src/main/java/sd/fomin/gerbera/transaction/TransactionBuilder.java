@@ -84,6 +84,8 @@ public class TransactionBuilder {
 
         transaction.addLine("Locktime", LOCK_TIME.toString());
 
+        transaction.setFee(fee);
+
         return transaction;
     }
 
