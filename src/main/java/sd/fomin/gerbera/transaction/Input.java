@@ -13,47 +13,34 @@ class Input {
 
     private static final UInt SEQUENCE = UInt.of(0xFFFFFFFF);
 
-    private byte[] outputTransactionHash;
+    private String transaction;
 
-    private UInt outputIndex;
+    private int index;
 
-    private byte[] lockingScript;
+    private String lock;
 
     private long satoshi;
 
     private PrivateKey privateKey;
 
-    Input(String transaction, int outputIndex, String lockingScript, long satoshi) {
-        this.outputTransactionHash = new ByteBuffer(HexUtils.asBytes(transaction)).bytesReversed();
-        this.outputIndex = UInt.of(outputIndex);
-        this.lockingScript = HexUtils.asBytes(lockingScript);
+    Input(String transaction, int index, String lock, long satoshi) {
+        this.transaction = transaction;
+        this.index = index;
+        this.lock = lock;
         this.satoshi = satoshi;
-        validateLockingScript();
-    }
-
-    private void validateLockingScript() {
-        if (lockingScript[0] != OpCodes.DUP
-                || lockingScript[1] != OpCodes.HASH160
-                || lockingScript[lockingScript.length - 2] != OpCodes.EQUALVERIFY
-                || lockingScript[lockingScript.length - 1] != OpCodes.CHECKSIG) {
-            throw new IllegalArgumentException("Only pay-to-pubkey-hash supported");
-        }
-
-        OpSize pubKeyHashSize = OpSize.ofByte(lockingScript[2]);
-        if (pubKeyHashSize.getSize() != lockingScript.length - 5) {
-            throw new IllegalArgumentException("Incorrect locking script format");
-        }
+        validate();
     }
 
     byte[] serializeForSign(boolean includeLockingScript) {
         ByteBuffer serialized = new ByteBuffer();
 
-        serialized.append(outputTransactionHash);
-        serialized.append(outputIndex.asLitEndBytes());
+        serialized.append(getTransactionHashBytesLitEnd());
+        serialized.append(UInt.of(index).asLitEndBytes());
 
         if (includeLockingScript) {
-            serialized.append(VarInt.of(lockingScript.length).asLitEndBytes());
-            serialized.append(lockingScript);
+            byte[] lockBytes = HexUtils.asBytes(lock);
+            serialized.append(VarInt.of(lockBytes.length).asLitEndBytes());
+            serialized.append(lockBytes);
         } else {
             serialized.append(VarInt.of(0).asLitEndBytes());
         }
@@ -67,9 +54,63 @@ class Input {
         privateKey = PrivateKey.ofWif(wif);
     }
 
+    void fillTransaction(byte[] signBase, Transaction transaction) {
+        transaction.addLine("   Input");
+
+        byte[] unlocking = unlocking(signBase);
+        transaction.addLine("      Transaction out", HexUtils.asString(getTransactionHashBytesLitEnd()));
+        transaction.addLine("      Tout index", UInt.of(index).toString());
+        transaction.addLine("      Unlock length", HexUtils.asString(VarInt.of(unlocking.length).asLitEndBytes()));
+        transaction.addLine("      Unlock", HexUtils.asString(unlocking));
+        transaction.addLine("      Sequence", SEQUENCE.toString());
+    }
+
+    boolean hasPrivateKey() {
+        return privateKey != null;
+    }
+
+    long getSatoshi() {
+        return satoshi;
+    }
+
+    private void validate() {
+        if (transaction == null) {
+            throw new IllegalArgumentException("Previous transaction hash must not be null");
+        }
+        if (index < 0) {
+            throw new IllegalArgumentException("Previous transaction output index must be a positive value");
+        }
+        if (lock == null) {
+            throw new IllegalArgumentException("Locking script must not be null");
+        }
+        if (satoshi <= 0) {
+            throw new IllegalArgumentException("Number of satoshi must be a positive value");
+        }
+        validateLockingScript();
+    }
+
+    private void validateLockingScript() {
+        byte[] lockBytes = HexUtils.asBytes(lock);
+
+        if (lockBytes[0] != OpCodes.DUP
+                || lockBytes[1] != OpCodes.HASH160
+                || lockBytes[lockBytes.length - 2] != OpCodes.EQUALVERIFY
+                || lockBytes[lockBytes.length - 1] != OpCodes.CHECKSIG) {
+            throw new IllegalArgumentException("Provided closing script is not P2PKH [" + lock + "]");
+        }
+
+        OpSize pubKeyHashSize = OpSize.ofByte(lockBytes[2]);
+        if (pubKeyHashSize.getSize() != lockBytes.length - 5) {
+            throw new IllegalArgumentException("Incorrect PKH size. " +
+                    "Expected: " + pubKeyHashSize.getSize() +
+                    ". [" + lock + "]");
+        }
+    }
+
     private byte[] unlocking(byte[] signBase) {
         if (privateKey == null) {
-            throw new IllegalStateException("No private key for input to sign");
+            throw new IllegalStateException(
+                    "No WIF provided for input [" + transaction + ", " + index + "]");
         }
 
         ByteBuffer unlocking = new ByteBuffer();
@@ -86,22 +127,7 @@ class Input {
         return unlocking.bytes();
     }
 
-    void fillTransaction(byte[] signBase, Transaction transaction) {
-        transaction.addLine("   Input");
-
-        byte[] unlocking = unlocking(signBase);
-        transaction.addLine("      Transaction out", HexUtils.asString(outputTransactionHash));
-        transaction.addLine("      Tout index", outputIndex.toString());
-        transaction.addLine("      Unlock length", HexUtils.asString(VarInt.of(unlocking.length).asLitEndBytes()));
-        transaction.addLine("      Unlock", HexUtils.asString(unlocking));
-        transaction.addLine("      Sequence", SEQUENCE.toString());
-    }
-
-    boolean hasPrivateKey() {
-        return privateKey != null;
-    }
-
-    long getSatoshi() {
-        return satoshi;
+    private byte[] getTransactionHashBytesLitEnd() {
+        return new ByteBuffer(HexUtils.asBytes(transaction)).bytesReversed();
     }
 }
