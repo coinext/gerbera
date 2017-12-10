@@ -67,6 +67,8 @@ Transaction transaction = TransactionBuilder.create()
 In case change address is not explicitly included (like in this example), but change is present,
 an `Exception` containing change satoshi amount is thrown. Change address must be explicitly declared so that change satoshi are not accidentally spent as fee.
 
+Transaction may contain multiple inputs and multiple outputs at the same time.
+
 ### Get transaction hex
 
 The built transaction object may be used to get raw transaction hex:
