@@ -15,17 +15,18 @@ The following is an example of how to build a transaction with one input and two
 
 ```java
 Transaction transaction = TransactionBuilder.create()
-                .from(
-                        "e034cda5a310c187daf34e553c68470b0ec04335da37e2bb8c714481a3003570", // from transaction big endian
-                        2,                                                                  // from Tout index
-                        "76a91444aeddf5d5f4f8fccf68ecd8e83242f6cfb6b9fa88ac",               // locking script
-                        5000)                                                               // satoshi
-                .signedWithWif("5Hy[--------------HIDDEN--------------]9rx")                // WIF for previously added inputs
-                .to("15r9m5rTho4NaTzC5GiXqHMGQ4Lst8XXJD", 1700)                             // output. where and how much (satoshi)
-                .to("1HaUAMnraw9VWHGaovtzpYgRMuGfUWNdZA", 2000)                             // another output
-                .withFee(300)                                                               // fee (satoshi)
-                .changeTo("17GAS26XPkzzoow5a79xGKszW7tRfiS4JV")                             // Send change to (if any)
-                .build();
+        .from(
+                "fb8212db8c6c0509d1892115b0a73acfc3c30668a0f51dc80758cc479e29e67e", // from transaction big endian
+                13,                                                                 // from Tout index
+                "76a91491b24bf9f5288532960ac687abb035127b1d28a588ac",               // locking script
+                40404                                                               // satoshi
+        )
+        .signedWithWif("5HpHagT65TZzG1PH3CSu63k8DbpvD8s5ip4nEB3kEsreAnchuDf")       // WIF for previously added inputs
+        .to("1NZUP3JAc9JkmbvmoTv7nVgZGtyJjirKV1", 17000)                            // output. where and how much (satoshi)   
+        .to("1JtK9CQw1syfWj1WtFMWomrYdV3W2tWBF9", 20000)                            // another output
+        .withFee(3000)                                                              // fee (satoshi)
+        .changeTo("17Vu7st1U1KwymUKU4jJheHHGRVNqrcfLD")                             // Send change to (if any)
+        .build();
 ```
 The `signWithWif()` method applies given private key to all the inputs added after last call of the `signWithWif()` method.
 
@@ -33,27 +34,34 @@ If **(all inputs) - (all outputs) - fee** gives positive value, it will be send 
 
 ### Build multiple-inputs transaction
 
-The following is an example of how to build a transaction with two inputs and one output.
+The following is an example of how to build a transaction with three inputs and one output.
+Two inputs use the same private key and the third is different:
 
 ```java
 Transaction transaction = TransactionBuilder.create()
-                .from(
-                        "bfd8a354f0ca7ccb1a59591f9a0ce08a5728babc5b74c993099e3e3c84d98296", // from transaction big endian
-                        0,                                                                  // from Tout index
-                        "76a914352c32a2b6ee5aa173334b6df32edd4117489a9a88ac",               // locking script
-                        1700                                                                // satoshi
-                )
-                .signedWithWif("L4U[--------------HIDDEN--------------]xUh")                // WIF for previously added inputs
-                .from(
-                        "bfd8a354f0ca7ccb1a59591f9a0ce08a5728babc5b74c993099e3e3c84d98296", // from transaction big endian
-                        1,                                                                  // from Tout index
-                        "76a914b5d66995560fb4ea489c6d70e733537288f0cdcd88ac",               // locking script
-                        2000                                                                // satoshi
-                )
-                .signedWithWif("5KN[--------------HIDDEN--------------]8hf")                // WIF for previously added inputs
-                .to("16BZ2txvJzywXtTxah7jVEZzerMpQT5ArH", 1000)                             // output. where and how much (satoshi)
-                .withFee(2700)                                                              // fee (satoshi)
-                .build();
+        .from(
+                "3722df3eff476fe31db8ae2b52806379bde58e9289026d10e425adc25c2e3f03", // from transaction big endian
+                1,                                                                  // from Tout index
+                "76a91491b24bf9f5288532960ac687abb035127b1d28a588ac",               // locking script
+                3000                                                                // satoshi
+        )
+        .signedWithWif("5HpHagT65TZzG1PH3CSu63k8DbpvD8s5ip4nEB3kEsreAnchuDf")       // WIF for previously added inputs
+        .from(
+                "262dc0cba867ba38ec5e92239acbe3074eea3a79105b8e551f60905b1cd79abe", // from transaction big endian
+                2,                                                                  // from Tout index
+                "76a91406afd46bcdfd22ef94ac122aa11f241244a37ecc88ac",               // locking script
+                2500                                                                // satoshi
+        )
+        .from(
+                "8b109e31552b7bd3a9c41a30c739eeb0ab90a6ffc92f5a9471e0874acd75e5ba", // from transaction big endian
+                12,                                                                 // from Tout index
+                "76a91406afd46bcdfd22ef94ac122aa11f241244a37ecc88ac",               // locking script
+                10000                                                               // satoshi
+        )
+        .signedWithWif("KwDiBf89QgGbjEhKnhXJuH7LrciVrZi3qYjgd9M7rFU74NMTptX4")      // WIF for previously added inputs
+        .to("1NZUP3JAc9JkmbvmoTv7nVgZGtyJjirKV1", 10000)                            // fee (satoshi)
+        .withFee(5500)
+        .build();
 ```
 
 In case change address is not explicitly included (like in this example), but change is present,
@@ -69,7 +77,7 @@ The output is a `String` that may be submitted to an online service to broadcast
 
 Result example:
 ```
-0100000001703500a38144718cbbe237da3543c00e0b47683c554ef3da87c110a3a5cd34e0020000008b483045022100c492d67d7e0344e8e34acabcb37a8f39ee78ac2cc6c3ce8a988bc90208231bae02203bcdc8811cdc8d50debdbe40614021578d245d0ada475b765c12e639f7cceeb7014104df661fe5f879a80bf362a13e6d50de70fda2eddca7d0643641d08f80c162669984547d59eb68c1dfd911e8ef64a9f2f9c8ccfe0ae206845c84c2df581ad51ca1ffffffff03a4060000000000001976a914352c32a2b6ee5aa173334b6df32edd4117489a9a88acd0070000000000001976a914b5d66995560fb4ea489c6d70e733537288f0cdcd88ace8030000000000001976a91444aeddf5d5f4f8fccf68ecd8e83242f6cfb6b9fa88ac00000000
+01000000017ee6299e47cc5807c81df5a06806c3c3cf3aa7b0152189d109056c8cdb1282fb0d0000008b483045022100a71f2610b30934545ffb6fc37af4cc8384523ef0aefbc90d47f148155aedccd902206b8efdddfb0bc39c4047e05d47ad6a80efaffee0f54fd77f26fbcce1ce80706001410479be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8ffffffff0368420000000000001976a914ec7eced2c57ed1292bc4eb9bfd13c9f7603bc33888ac204e0000000000001976a914c42e7ef92fdb603af844d064faad95db9bcdfd3d88ac94010000000000001976a9144747e8746cddb33b0f7f95a90f89f89fb387cbb688ac00000000
 ```
 
 
@@ -85,24 +93,24 @@ Result example:
 Version                  01000000
 Input count              01
    Input
-      Transaction out    703500a38144718cbbe237da3543c00e0b47683c554ef3da87c110a3a5cd34e0
-      Tout index         02000000
+      Transaction out    7ee6299e47cc5807c81df5a06806c3c3cf3aa7b0152189d109056c8cdb1282fb
+      Tout index         0d000000
       Unlock length      8b
-      Unlock             483045022100e635b1c21dff127156f954a610062b2880d2f3a1752017eadeb277a773e4e93b022011b4cec19ce81c7cc25ed5068d8428e2bfc7eac32543dc825cb12368bdd5d516014104df661fe5f879a80bf362a13e6d50de70fda2eddca7d0643641d08f80c162669984547d59eb68c1dfd911e8ef64a9f2f9c8ccfe0ae206845c84c2df581ad51ca1
+      Unlock             483045022100a71f2610b30934545ffb6fc37af4cc8384523ef0aefbc90d47f148155aedccd902206b8efdddfb0bc39c4047e05d47ad6a80efaffee0f54fd77f26fbcce1ce80706001410479be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8
       Sequence           ffffffff
 Output count             03
    Output (Custom)
-      Satoshi            a406000000000000
+      Satoshi            6842000000000000
       Lock length        19
-      Lock               76a914352c32a2b6ee5aa173334b6df32edd4117489a9a88ac
+      Lock               76a914ec7eced2c57ed1292bc4eb9bfd13c9f7603bc33888ac
    Output (Custom)
-      Satoshi            d007000000000000
+      Satoshi            204e000000000000
       Lock length        19
-      Lock               76a914b5d66995560fb4ea489c6d70e733537288f0cdcd88ac
+      Lock               76a914c42e7ef92fdb603af844d064faad95db9bcdfd3d88ac
    Output (Change)
-      Satoshi            e803000000000000
+      Satoshi            9401000000000000
       Lock length        19
-      Lock               76a91444aeddf5d5f4f8fccf68ecd8e83242f6cfb6b9fa88ac
+      Lock               76a9144747e8746cddb33b0f7f95a90f89f89fb387cbb688ac
 Locktime                 00000000
 ```
 
@@ -115,9 +123,9 @@ transaction.getTransactionInfo()
 Result example:
 ```
 Size (bytes):
-  291
+  292
 Fee (satoshi/byte):
-  1.031
+  10.274
 ```
 
 ## How to compile
