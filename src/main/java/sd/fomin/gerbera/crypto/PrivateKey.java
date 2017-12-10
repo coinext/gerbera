@@ -3,9 +3,9 @@ package sd.fomin.gerbera.crypto;
 import sd.fomin.gerbera.util.ByteBuffer;
 import sd.fomin.gerbera.util.Base58CheckUtils;
 import sd.fomin.gerbera.util.HexUtils;
+import sd.fomin.gerbera.util.ApplicationRandom;
 
 import java.math.BigInteger;
-import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -13,7 +13,7 @@ import static sd.fomin.gerbera.crypto.Numbers.*;
 
 public class PrivateKey {
 
-    private static final Random RND = new SecureRandom();
+    private static final Random RND = ApplicationRandom.getRandom();
 
     private BigInteger key;
 
