@@ -6,6 +6,8 @@ public interface OpCodes {
 
     byte HASH160 = (byte) 0xA9;
 
+    byte EQUAL = (byte) 0x87;
+
     byte EQUALVERIFY = (byte) 0x88;
 
     byte CHECKSIG = (byte) 0xAC;

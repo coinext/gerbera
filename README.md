@@ -2,11 +2,13 @@
 Generated transaction hex may be later broadcast via online services (e.g. [Blockchain.info Broadcast](https://blockchain.info/ru/pushtx)).
 
 ## What's Supported
+* Outputs:
+    * `P2PKH` (1-Addresses. Regular and compressed)
+    * `P2SH` (3-Addresses. Segwit in particular)
+* Inputs from `P2PKH`-produced outputs only
 * `SIGHASH_ALL` signature type only
-* `P2PKH` transaction type only
 * Multiple inputs from different addresses (signed with different keys)
 * Multiple outputs
-* Regular and compressed addresses
 
 ## Code examples
 ### Build multiple-outputs transaction
@@ -23,7 +25,7 @@ Transaction transaction = TransactionBuilder.create()
         )
         .signedWithWif("5HpHagT65TZzG1PH3CSu63k8DbpvD8s5ip4nEB3kEsreAnchuDf")       // WIF for previously added inputs
         .to("1NZUP3JAc9JkmbvmoTv7nVgZGtyJjirKV1", 17000)                            // output. where and how much (satoshi)   
-        .to("1JtK9CQw1syfWj1WtFMWomrYdV3W2tWBF9", 20000)                            // another output
+        .to("31h38a54tFMrR8kvVig3R23ntQMoitzkAf", 20000)                            // another output
         .withFee(3000)                                                              // fee (satoshi)
         .changeTo("17Vu7st1U1KwymUKU4jJheHHGRVNqrcfLD")                             // Send change to (if any)
         .build();
@@ -97,8 +99,8 @@ Input count              01
    Input
       Transaction out    7ee6299e47cc5807c81df5a06806c3c3cf3aa7b0152189d109056c8cdb1282fb
       Tout index         0d000000
-      Unlock length      8b
-      Unlock             483045022100a71f2610b30934545ffb6fc37af4cc8384523ef0aefbc90d47f148155aedccd902206b8efdddfb0bc39c4047e05d47ad6a80efaffee0f54fd77f26fbcce1ce80706001410479be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8
+      Unlock length      8a
+      Unlock             47304402206fb7d70259301222232e8e006cf1d0c6814666e52b5379e04b7cef0d695c4ff202205323e65a65bd74d904d02dfa3d33bfd1d937cd82fadf1a41d9da9d288498163a01410479be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8
       Sequence           ffffffff
 Output count             03
    Output (Custom)
@@ -107,8 +109,8 @@ Output count             03
       Lock               76a914ec7eced2c57ed1292bc4eb9bfd13c9f7603bc33888ac
    Output (Custom)
       Satoshi            204e000000000000
-      Lock length        19
-      Lock               76a914c42e7ef92fdb603af844d064faad95db9bcdfd3d88ac
+      Lock length        17
+      Lock               a914000102030405060708090001020304050607080987
    Output (Change)
       Satoshi            9401000000000000
       Lock length        19

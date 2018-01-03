@@ -10,26 +10,31 @@ public class RawTransactionTest {
     @Test
     public void testFull() {
         String expectedRaw =
-                "0100000004033f2e5cc2ad25e4106d0289928ee5bd796380522baeb81de36f47ff3edf2237010000" +
-                "008a4730440220080a8e8dbf870a060daad725e79a79700e6bcf7f282d98f837cc94ebdd58111f02" +
-                "20348f1fa4834844d442d5f54b7977ea0aa368bb77c12d56bc4d9ccc9071ecd73001410479be667e" +
-                "f9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798483ada7726a3c4655da4fbfc" +
-                "0e1108a8fd17b448a68554199c47d08ffb10d4b8ffffffff7ee6299e47cc5807c81df5a06806c3c3" +
-                "cf3aa7b0152189d109056c8cdb1282fb0d0000008b483045022100c3bd4651cb467dc8901445e611" +
-                "e17f7c73038507430bb07aea386a80c93cfdc902206f55954c33677fed8335c6b4e651dbbb79a56d" +
-                "8ae0b350a3946d0e1486ff5cc401410479be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d9" +
-                "59f2815b16f81798483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8" +
-                "ffffffffbe9ad71c5b90601f558e5b10793aea4e07e3cb9a23925eec38ba67a8cbc02d26f5030000" +
-                "6b483045022100f6ee8ec9f6ff414fa4d6c1813232d4edf5d90270cf2f792ca56dfd382046896402" +
-                "2012cf11bd0a705c7f8c7c046e94bc67a9ba3221aca86f62ec2d6c91cd66f27035012102c6047f94" +
-                "41ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5ffffffffbae575cd4a87e071" +
-                "945a2fc9ffa690abb0ee39c7301ac4a9d37b2b55319e108b394e00006b483045022100d039519426" +
-                "7d0241e6b7b189fa847eb6c918ea561f4c5c9e8491b2261c4b8632022043b5731b7d0035b6a9b1f3" +
-                "e44f1e27adaa1ec612c51945b6619b2bed204e4abb012102c6047f9441ed7d6d3045406e95c07cd8" +
-                "5c778e4b8cef3ca7abac09b95c709ee5ffffffff03a0860100000000001976a914ec7eced2c57ed1" +
-                "292bc4eb9bfd13c9f7603bc33888ac14050000000000001976a914c42e7ef92fdb603af844d064fa" +
-                "ad95db9bcdfd3d88acb6f00400000000001976a9144747e8746cddb33b0f7f95a90f89f89fb387cb" +
-                "b688ac00000000";
+                "0100000004033f2e5cc2ad25e4106d0289928ee5bd796380522baeb81de36f47" +
+                "ff3edf2237010000008b483045022100832f9cba48483a812c1eeccb5e7d80d6" +
+                "0bdb1425a19a3d24e18f9a10ba6c1213022020ac8f35cff76d4df19847eb3e5e" +
+                "f058ba0ef03ddaf7e05b11cb586637aad61c01410479be667ef9dcbbac55a062" +
+                "95ce870b07029bfcdb2dce28d959f2815b16f81798483ada7726a3c4655da4fb" +
+                "fc0e1108a8fd17b448a68554199c47d08ffb10d4b8ffffffff7ee6299e47cc58" +
+                "07c81df5a06806c3c3cf3aa7b0152189d109056c8cdb1282fb0d0000008b4830" +
+                "45022100c3bd4651cb467dc8901445e611e17f7c73038507430bb07aea386a80" +
+                "c93cfdc902201473a8a508c85bdc04720678590d04278089d35554babfcec21b" +
+                "4989d3638e1b01410479be667ef9dcbbac55a06295ce870b07029bfcdb2dce28" +
+                "d959f2815b16f81798483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554" +
+                "199c47d08ffb10d4b8ffffffffbe9ad71c5b90601f558e5b10793aea4e07e3cb" +
+                "9a23925eec38ba67a8cbc02d26f50300006a473044022030a84f1a9f6a02c4fc" +
+                "44943220a3b4eb836790ef4db7a2422365f394437e7a00022067510ba9f503c9" +
+                "02f6d058da37e57d989bf36d74c378597121292e9eb36f2454012102c6047f94" +
+                "41ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5ffffffff" +
+                "bae575cd4a87e071945a2fc9ffa690abb0ee39c7301ac4a9d37b2b55319e108b" +
+                "394e00006b483045022100977466bf3b963d8919b564c85074eb2719667a1eda" +
+                "e9104137dbdc3475a2ddc402204eaf5fbeacda741eb0aedc4e026a0705d55921" +
+                "d5a3ee32b9d29a9ac7bd7b7747012102c6047f9441ed7d6d3045406e95c07cd8" +
+                "5c778e4b8cef3ca7abac09b95c709ee5ffffffff0450c30000000000001976a9" +
+                "14ec7eced2c57ed1292bc4eb9bfd13c9f7603bc33888ac140500000000000019" +
+                "76a914c42e7ef92fdb603af844d064faad95db9bcdfd3d88ac50c30000000000" +
+                "0017a914000102030405060708090001020304050607080987b6f00400000000" +
+                "001976a9144747e8746cddb33b0f7f95a90f89f89fb387cbb688ac00000000";
 
         Transaction transaction = TransactionBuilder.create()
                 .from(
@@ -58,8 +63,9 @@ public class RawTransactionTest {
                         400128
                 )
                 .signedWithWif("KwDiBf89QgGbjEhKnhXJuH7LrciVrZi3qYjgd9M7rFU74NMTptX4")
-                .to("1NZUP3JAc9JkmbvmoTv7nVgZGtyJjirKV1", 100000)
+                .to("1NZUP3JAc9JkmbvmoTv7nVgZGtyJjirKV1", 50000)
                 .to("1JtK9CQw1syfWj1WtFMWomrYdV3W2tWBF9", 1300)
+                .to("31h38a54tFMrR8kvVig3R23ntQMoitzkAf", 50000)
                 .withFee(40002)
                 .changeTo("17Vu7st1U1KwymUKU4jJheHHGRVNqrcfLD")
                 .build();

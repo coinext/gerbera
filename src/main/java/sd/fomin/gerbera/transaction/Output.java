@@ -44,17 +44,29 @@ class Output {
     }
 
     private byte[] getLockingScript(String destination) {
-        byte[] decodedAddress = Base58CheckUtils.decode(destination);
-        if (decodedAddress[0] != 0) {
-            throw new IllegalArgumentException("Wrong destination address");
+        if (!destination.startsWith("1") && !destination.startsWith("3")) {
+            throw new IllegalArgumentException("Only destination addresses starting with 1 (P2PKH) or 3 (P2SH) supported.");
         }
 
-        ByteBuffer lockingScript = new ByteBuffer();
+        byte[] decodedAddress = Base58CheckUtils.decode(destination);
+        byte[] hash = Arrays.copyOfRange(decodedAddress, 1, decodedAddress.length);
 
-        lockingScript.append(OpCodes.DUP, OpCodes.HASH160);
-        lockingScript.append(OpSize.ofInt(decodedAddress.length - 1).getSize());
-        lockingScript.append(Arrays.copyOfRange(decodedAddress, 1, decodedAddress.length));
-        lockingScript.append(OpCodes.EQUALVERIFY, OpCodes.CHECKSIG);
+        ByteBuffer lockingScript = new ByteBuffer();
+        if (decodedAddress[0] == 0) {
+            //P2PKH
+            lockingScript.append(OpCodes.DUP, OpCodes.HASH160);
+            lockingScript.append(OpSize.ofInt(hash.length).getSize());
+            lockingScript.append(hash);
+            lockingScript.append(OpCodes.EQUALVERIFY, OpCodes.CHECKSIG);
+        } else if (decodedAddress[0] == 5) {
+            //P2SH
+            lockingScript.append(OpCodes.HASH160);
+            lockingScript.append(OpSize.ofInt(hash.length).getSize());
+            lockingScript.append(hash);
+            lockingScript.append(OpCodes.EQUAL);
+        } else {
+            throw new IllegalStateException("Should never happen");
+        }
 
         return lockingScript.bytes();
     }
