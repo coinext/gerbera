@@ -8,9 +8,19 @@ import java.util.Random;
 
 public class ApplicationRandom {
 
-    private static final Random random;
+    private static Random random;
 
     static {
+        reset();
+    }
+
+    private ApplicationRandom() { }
+
+    public static Random get() {
+        return random;
+    }
+
+    public static void reset() {
         Properties properties = new Properties();
         try (InputStream in = new BufferedInputStream(ApplicationRandom.class.getResourceAsStream("/gerbera.properties"))) {
             properties.load(in);
@@ -24,11 +34,5 @@ public class ApplicationRandom {
         } else {
             random = new Random(7);
         }
-    }
-
-    private ApplicationRandom() { }
-
-    public static Random getRandom() {
-        return random;
     }
 }

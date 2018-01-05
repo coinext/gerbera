@@ -8,13 +8,10 @@ import sd.fomin.gerbera.util.ApplicationRandom;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 
 import static sd.fomin.gerbera.crypto.Numbers.*;
 
 public class PrivateKey {
-
-    private static final Random RND = ApplicationRandom.getRandom();
 
     private BigInteger key;
 
@@ -93,7 +90,9 @@ public class PrivateKey {
     }
 
     private BigInteger getBigRandom() {
-        BigInteger bigRandom = new BigInteger(N.bitLength(), RND).mod(N.subtract(BigInteger.ONE)).add(BigInteger.ONE);
+        BigInteger bigRandom = new BigInteger(N.bitLength(), ApplicationRandom.get())
+                .mod(N.subtract(BigInteger.ONE))
+                .add(BigInteger.ONE);
         return bigRandom;
     }
 
