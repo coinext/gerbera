@@ -9,7 +9,7 @@ public class RawTransactionTest {
 
     @Test
     public void testFull() {
-        String expectedRaw =
+        String expectedRawMainnet =
                 "0100000004033f2e5cc2ad25e4106d0289928ee5bd796380522baeb81de36f47" +
                 "ff3edf2237010000008b483045022100832f9cba48483a812c1eeccb5e7d80d6" +
                 "0bdb1425a19a3d24e18f9a10ba6c1213022020ac8f35cff76d4df19847eb3e5e" +
@@ -36,7 +36,7 @@ public class RawTransactionTest {
                 "0017a914000102030405060708090001020304050607080987b6f00400000000" +
                 "001976a9144747e8746cddb33b0f7f95a90f89f89fb387cbb688ac00000000";
 
-        Transaction transaction = TransactionBuilder.create()
+        Transaction transactionMainnet = TransactionBuilder.create()
                 .from(
                         "3722df3eff476fe31db8ae2b52806379bde58e9289026d10e425adc25c2e3f03",
                         1,
@@ -70,6 +70,69 @@ public class RawTransactionTest {
                 .changeTo("17Vu7st1U1KwymUKU4jJheHHGRVNqrcfLD")
                 .build();
 
-        Assert.assertEquals(expectedRaw, transaction.getRawTransaction());
+        Assert.assertEquals(expectedRawMainnet, transactionMainnet.getRawTransaction());
+
+        String expectedRawTestnet =
+                "01000000047fa41e3f7f2985eb88be91f7f0257cf6c7522258efa87f10cf883d" +
+                "71e5a65ab9010000008a47304402207b1450f4d80f892d60121870cfec7381f6" +
+                "eb15285c69616431a293ba6a10839202206ac041d3b1bf6ac20eeacbc94a7a16" +
+                "c3574aa21621f28d18c463ca34bc9d13b9014104c1029aa08c5e72d09228d9bb" +
+                "90ae48888a6955f79ec052753a81dfd049f39bb75f8b7142bf86c237a3a5e589" +
+                "2358b5a9c6a393c47a0db5bf48d36859f1a68dc1ffffffff7fa41e3f7f2985eb" +
+                "88be91f7f0257cf6c7522258efa87f10cf883d71e5a65ab90d0000008b483045" +
+                "022100e016ee24f49cefd6a35fa222897dbe722b510b771399e3e5e4c3b568cd" +
+                "667e32022029107f46c811885303f6524e65777b8d69c03f8fc24ebd1fff4a95" +
+                "be6e7fe4af014104c1029aa08c5e72d09228d9bb90ae48888a6955f79ec05275" +
+                "3a81dfd049f39bb75f8b7142bf86c237a3a5e5892358b5a9c6a393c47a0db5bf" +
+                "48d36859f1a68dc1ffffffff7fa41e3f7f2985eb88be91f7f0257cf6c7522258" +
+                "efa87f10cf883d71e5a65ab9f50300006a473044022048f9691f722bf46e8b7a" +
+                "3c1c57d9b3e2fa7bdbb683de3afaeb5d1209f69c4e360220224eb1a6c6c37551" +
+                "a94784a7c24c833172d60bfe12849d2bf93835429e9b7c41012103c1029aa08c" +
+                "5e72d09228d9bb90ae48888a6955f79ec052753a81dfd049f39bb7ffffffffb9" +
+                "5aa6e5713d88cf107fa8ef582252c7f67c25f0f791be88eb85297f3f1ea47f39" +
+                "4e00006b483045022100dc2249bc094c8bf36014497ca1c2a674bd1f8d612a4c" +
+                "386e4786a2e3de71676d022076938410c36ae2ff1c28180b6606fad39db09890" +
+                "92ec35007e82ec3903ab9242012103c1029aa08c5e72d09228d9bb90ae48888a" +
+                "6955f79ec052753a81dfd049f39bb7ffffffff0450c30000000000001976a914" +
+                "9e96150c26d90fb043e3a7bf2690cda1ff6c233388ac14050000000000001976" +
+                "a9146400837067ff8bdc6458e1c7f35267a6acb9f97c88ac50c3000000000000" +
+                "17a914a9974100aeee974a20cda9a2f545704a0ab54fdc87b6f0040000000000" +
+                "1976a914b44b166f47b2a24712cc27fab9518686d32777fc88ac00000000";
+
+        Transaction transactionTestnet = TransactionBuilder.create(false)
+                .from(
+                        "b95aa6e5713d88cf107fa8ef582252c7f67c25f0f791be88eb85297f3f1ea47f",
+                        1,
+                        "76a9140af1ae78875d89840db368c013e9938468a493db88ac",
+                        20
+                )
+                .from(
+                        "b95aa6e5713d88cf107fa8ef582252c7f67c25f0f791be88eb85297f3f1ea47f",
+                        13,
+                        "76a9140af1ae78875d89840db368c013e9938468a493db88ac",
+                        4040
+                )
+                .signedWithWif("93RmmDH1KBdXpnx4pQqrCJv1h6kKxF3K4FD7eCdXin12SsiVXSX")
+                .from(
+                        "b95aa6e5713d88cf107fa8ef582252c7f67c25f0f791be88eb85297f3f1ea47f",
+                        1013,
+                        "76a9141f594f74c37771ef1d3c73317411d84e52ed743188ac",
+                        60880
+                )
+                .from(
+                        "7fa41e3f7f2985eb88be91f7f0257cf6c7522258efa87f10cf883d71e5a65ab9",
+                        20025,
+                        "76a9141f594f74c37771ef1d3c73317411d84e52ed743188ac",
+                        400128
+                )
+                .signedWithWif("cViLa9BePFvF3wp3rGEc8v4z3zNEepyChKiUKCLEbPd7NqqtDoA7")
+                .to("muyUrFwhKH8EG7szasDbL1Ytsug9MvgLA4", 50000)
+                .to("mpdiUuo7vfU4hGkb2g9n6GPabHiMK3h7uw", 1300)
+                .to("2N8hwP1WmJrFF5QWABn38y63uYLhnJYJYTF", 50000)
+                .withFee(40002)
+                .changeTo("mwxFsmFviNnxAJngFBovrnvzYP8WMNiogW")
+                .build();
+
+        Assert.assertEquals(expectedRawTestnet, transactionTestnet.getRawTransaction());
     }
 }
