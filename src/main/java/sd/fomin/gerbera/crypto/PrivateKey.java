@@ -7,6 +7,7 @@ import sd.fomin.gerbera.util.ApplicationRandom;
 
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 import static sd.fomin.gerbera.crypto.Numbers.*;
@@ -24,34 +25,42 @@ public class PrivateKey {
         this.compressed = compressed;
     }
 
-    public static PrivateKey ofWif(String wif) {
+    public static PrivateKey ofWif(boolean mainNet, String wif) {
+        validateWifFormat(mainNet, wif);
+
         boolean compressed = false;
 
-        if (!wif.startsWith("5") && !wif.startsWith("K") && !wif.startsWith("L")) {
-            throw new IllegalArgumentException("WIF must start from 5, K or L");
-        }
-
+        byte prefix = mainNet ? (byte) 0x80 : (byte) 0xEF;
         byte[] decoded = Base58CheckUtils.decode(wif);
-        if (decoded[0] != (byte) 0x80) {
-            throw new IllegalArgumentException("Decoded WIF must start with 0x80 byte");
+        if (decoded[0] != prefix) {
+            throw new IllegalArgumentException("Decoded WIF must start with 0x" + HexUtils.asString(new byte[] { prefix }) + " byte");
         }
 
         byte[] pkBytes;
-        if (wif.startsWith("5")) {
+        if (decoded.length == 33) {
             pkBytes = Arrays.copyOfRange(decoded, 1, decoded.length);
-        } else {
+        } else if (decoded.length == 34) {
             if (decoded[decoded.length - 1] != 0x01) {
                 throw new IllegalArgumentException("The last byte of decoded compressed WIF is expected to be 0x01");
             }
             compressed = true;
             pkBytes = Arrays.copyOfRange(decoded, 1, decoded.length - 1);
-        }
-
-        if (pkBytes.length != 32) {
-            throw new IllegalArgumentException("Incorrect wif length");
+        } else {
+            throw new IllegalArgumentException("Incorrect WIF length: " + decoded.length);
         }
 
         return new PrivateKey(new BigInteger(HexUtils.asString(pkBytes), 16), compressed);
+    }
+
+    private static void validateWifFormat(boolean mainNet, String wif) {
+        List<Character> prefixWif = mainNet ? Arrays.asList('5') : Arrays.asList('9');
+        List<Character> prefixWifComp = mainNet ? Arrays.asList('K', 'L') : Arrays.asList('c');
+        char prefix = wif.charAt(0);
+
+        if (!prefixWif.contains(prefix) && !prefixWifComp.contains(prefix)) {
+            throw new IllegalArgumentException("WIF must start with " + prefixWif + " (for uncompressed) " +
+                    "or " + prefixWifComp + " (for compressed)");
+        }
     }
 
     public byte[] sign(byte[] bytesToSign) {

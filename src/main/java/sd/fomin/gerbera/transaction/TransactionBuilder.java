@@ -11,10 +11,13 @@ import java.util.List;
 
 public class TransactionBuilder {
 
-    private static final String DONATE_ADDRESS = "16F1Z5PWTxSLfc47xuuQuTmjYMxs2UuKVT";
+    private static final String DONATE_ADDRESS_MAINNET = "16F1Z5PWTxSLfc47xuuQuTmjYMxs2UuKVT";
+    private static final String DONATE_ADDRESS_TESTNET = "mwC7PAhQWSHmjeVXuCwXaP28kjMmsr2LZk";
 
     private static final UInt VERSION = UInt.of(1);
     private static final UInt LOCK_TIME = UInt.of(0);
+
+    private boolean mainNet;
 
     private List<Input> inputs = new LinkedList<>();
     private List<Output> outputs = new LinkedList<>();
@@ -24,10 +27,16 @@ public class TransactionBuilder {
     private long fee;
     private long donate;
 
-    private TransactionBuilder() { }
+    private TransactionBuilder(boolean mainNet) {
+        this.mainNet = mainNet;
+    }
 
     public static TransactionBuilder create() {
-        return new TransactionBuilder();
+        return new TransactionBuilder(true);
+    }
+
+    public static TransactionBuilder create(boolean mainNet) {
+        return new TransactionBuilder(mainNet);
     }
 
     public TransactionBuilder from(String fromTransactionBigEnd, int fromToutNumber, String closingScript, long satoshi) {
@@ -36,12 +45,12 @@ public class TransactionBuilder {
     }
 
     public TransactionBuilder signedWithWif(String privateKey) {
-        inputs.stream().filter(input -> !input.hasPrivateKey()).forEach(input -> input.setPrivateKey(privateKey));
+        inputs.stream().filter(input -> !input.hasPrivateKey()).forEach(input -> input.setPrivateKey(mainNet, privateKey));
         return this;
     }
 
     public TransactionBuilder to(String address, long value) {
-        outputs.add(new Output(value, address, OutputType.CUSTOM));
+        outputs.add(new Output(mainNet, value, address, OutputType.CUSTOM));
         return this;
     }
 
@@ -62,12 +71,13 @@ public class TransactionBuilder {
 
     public Transaction build() {
         if (donate > 0) {
-            outputs.add(new Output(donate, DONATE_ADDRESS, OutputType.DONATE));
+            String donateAddress = mainNet ? DONATE_ADDRESS_MAINNET : DONATE_ADDRESS_TESTNET;
+            outputs.add(new Output(mainNet, donate, donateAddress, OutputType.DONATE));
         }
 
         long change = getChange();
         if (change > 0) {
-            outputs.add(new Output(change, changeAddress, OutputType.CHANGE));
+            outputs.add(new Output(mainNet, change, changeAddress, OutputType.CHANGE));
         }
 
         Transaction transaction = new Transaction();
@@ -117,7 +127,8 @@ public class TransactionBuilder {
         long change = income - outcome - fee;
 
         if (change < 0) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("Not enough satoshi. All inputs: " + income +
+                    ". All outputs with fee: " + (outcome + fee));
         }
 
         if (change > 0 && changeAddress == null) {

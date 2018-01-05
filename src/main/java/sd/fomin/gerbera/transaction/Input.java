@@ -50,8 +50,8 @@ class Input {
         return serialized.bytes();
     }
 
-    void setPrivateKey(String wif) {
-        privateKey = PrivateKey.ofWif(wif);
+    void setPrivateKey(boolean mainNet, String wif) {
+        privateKey = PrivateKey.ofWif(mainNet, wif);
     }
 
     void fillTransaction(byte[] signBase, Transaction transaction) {

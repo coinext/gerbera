@@ -2,13 +2,21 @@
 Generated transaction hex may be later broadcast via online services (e.g. [Blockchain.info Broadcast](https://blockchain.info/ru/pushtx)).
 
 ## What's Supported
-* Outputs:
+* Send to:
     * `P2PKH` (1-Addresses. Regular and compressed)
-    * `P2SH` (3-Addresses. Segwit in particular)
-* Inputs from `P2PKH`-produced outputs only
-* `SIGHASH_ALL` signature type only
+    * `P2SH` (3-Addresses, including SegWit)
+* Spend from:
+    * `P2PKH`-produced outputs (1-Addresses)
+* Signature types
+    * `SIGHASH_ALL`
 * Multiple inputs from different addresses (signed with different keys)
 * Multiple outputs
+* Networks
+    * MainNet
+    * TestNet
+
+## Next to implement
+* Spend from `P2SH-P2WPKH` SegWit
 
 ## Code examples
 ### Build multiple-outputs transaction
@@ -70,6 +78,18 @@ In case change address is not explicitly included (like in this example), but ch
 an `Exception` containing change satoshi amount is thrown. Change address must be explicitly declared so that change satoshi are not accidentally spent as fee.
 
 Transaction may contain multiple inputs and multiple outputs at the same time.
+
+### Build transaction for TestNet
+
+To build a TestNet transaction, create a `TransactionBulder` with `false` argument (`true` is for MainNet, which is default)
+```java
+Transaction transaction = TransactionBuilder.create(false)
+        ...
+        ...
+        ...
+        .build();
+```
+Note that in TestNet, addresses and WIFs have different prefixes.
 
 ### Get transaction hex
 

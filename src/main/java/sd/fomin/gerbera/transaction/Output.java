@@ -9,6 +9,7 @@ import sd.fomin.gerbera.util.Base58CheckUtils;
 import sd.fomin.gerbera.util.HexUtils;
 
 import java.util.Arrays;
+import java.util.List;
 
 class Output {
 
@@ -18,9 +19,9 @@ class Output {
 
     private OutputType type;
 
-    Output(long satoshi, String destination, OutputType type) {
+    Output(boolean mainNet, long satoshi, String destination, OutputType type) {
         this.satoshi = satoshi;
-        this.lockingScript = getLockingScript(destination);
+        this.lockingScript = getLockingScript(mainNet, destination);
         this.type = type;
     }
 
@@ -43,22 +44,23 @@ class Output {
         transaction.addLine("      Lock", HexUtils.asString(lockingScript));
     }
 
-    private byte[] getLockingScript(String destination) {
-        if (!destination.startsWith("1") && !destination.startsWith("3")) {
-            throw new IllegalArgumentException("Only destination addresses starting with 1 (P2PKH) or 3 (P2SH) supported.");
-        }
+    private byte[] getLockingScript(boolean mainNet, String destination) {
+        validateDestinationAddress(mainNet, destination);
 
         byte[] decodedAddress = Base58CheckUtils.decode(destination);
         byte[] hash = Arrays.copyOfRange(decodedAddress, 1, decodedAddress.length);
 
+        byte prefixP2PKH = mainNet ? (byte) 0x00 : (byte) 0x6F;
+        byte prefixP2SH = mainNet ? (byte) 0x05 : (byte) 0xC4;
+
         ByteBuffer lockingScript = new ByteBuffer();
-        if (decodedAddress[0] == 0) {
+        if (decodedAddress[0] == prefixP2PKH) {
             //P2PKH
             lockingScript.append(OpCodes.DUP, OpCodes.HASH160);
             lockingScript.append(OpSize.ofInt(hash.length).getSize());
             lockingScript.append(hash);
             lockingScript.append(OpCodes.EQUALVERIFY, OpCodes.CHECKSIG);
-        } else if (decodedAddress[0] == 5) {
+        } else if (decodedAddress[0] == prefixP2SH) {
             //P2SH
             lockingScript.append(OpCodes.HASH160);
             lockingScript.append(OpSize.ofInt(hash.length).getSize());
@@ -69,6 +71,21 @@ class Output {
         }
 
         return lockingScript.bytes();
+    }
+
+    private void validateDestinationAddress(boolean mainNet, String destination) {
+        if (destination == null || destination.isEmpty()) {
+            throw new IllegalArgumentException("Destination address must not be empty");
+        }
+
+        List<Character> prefixP2PKH = mainNet ? Arrays.asList('1') : Arrays.asList('m', 'n');
+        List<Character> prefixP2SH = Arrays.asList(mainNet ? '3' : '2');
+        char prefix = destination.charAt(0);
+
+        if (!prefixP2PKH.contains(prefix) && !prefixP2SH.contains(prefix)) {
+            throw new IllegalArgumentException("Only destination addresses starting with " + prefixP2PKH + " (P2PKH) " +
+                    "or " + prefixP2SH + " (P2SH) supported.");
+        }
     }
 
     long getSatoshi() {
