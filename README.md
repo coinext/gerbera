@@ -7,6 +7,7 @@ Generated transaction hex may be later broadcast via online services (e.g. [Bloc
     * `P2SH` (3-Addresses, including SegWit)
 * Spend from:
     * `P2PKH`-produced outputs (1-Addresses)
+    * `P2SH-P2WPKH` segwit outputs (3-Addresses)
 * Signature types
     * `SIGHASH_ALL`
 * Multiple inputs from different addresses (signed with different keys)
@@ -16,7 +17,7 @@ Generated transaction hex may be later broadcast via online services (e.g. [Bloc
     * TestNet
 
 ## Next to implement
-* Spend from `P2SH-P2WPKH` SegWit
+* Correct size calculation for SegWit transactions
 
 ## Code examples
 ### Build multiple-outputs transaction
@@ -138,6 +139,35 @@ Output count             03
 Locktime                 00000000
 ```
 
+For SegWit transactions (spending SegWit outputs), result example is:
+```
+Version                  01000000
+Marker                   00
+Flag                     01
+Input count              02
+   Input (Segwit)
+      Transaction out    82cb6eb26722118afac52ba256f8753f44de29637bb874fa5d952ebdf952a8cb
+      Tout index         02000000
+      Unlock length      17
+      Unlock             160014033118abb28063208561dc3ce63bdb32880a78ef
+      Sequence           ffffffff
+   Input
+      Transaction out    84b1959dbc3e7dd49b90b5012922a82022fc5cf2df6d0fe23a2d1ad8d615d3cf
+      Tout index         00000000
+      Unlock length      8b
+      Unlock             483045022100c592992fffde118fe8b37e30ee46b7a6ca276be5486c3022e6e20ad4bec5947b02203772a20074aacf7dd3cd37fc36afeba88d8e114fa1e8191bd9bc9b52a38db26a0141047cab4279ec773172c1eeb65b7292149df9bb2f1fb6c7dcacf043aabb893ad19fa90c4286bbb50b211ce6e272dccd511310041c2843af6059d90df4a186782134
+      Sequence           ffffffff
+Output count             01
+   Output (Custom)
+      Satoshi            49cdec0600000000
+      Lock length        17
+      Lock               a914a9974100aeee974a20cda9a2f545704a0ab54fdc87
+Witnesses
+   Witness               0247304402206bb7c127506f6c25fead2071744014e6111da6af31092e45a1c8eefb73cebb3a02205c2573d4d35bfa5982af5067bcca90473c5cf83844420ab2954d31503abcec9f0121030d7ca27f28ea0b5b4b57605d9ec3f05a2858667529f65797f1cc4b50e2be149f
+   Witness               00
+Locktime                 00000000
+```
+
 ### Get additional transaction information
 To get additional transaction info (size in bytes and satoshi/byte fee) call the following method of the `transaction` object:
 ```java
@@ -151,6 +181,9 @@ Size (bytes):
 Fee (satoshi/byte):
   10.274
 ```
+
+It is important to note, that for Segwit transactions, the size is regular transactions size.
+Showing size SegWit transactions occupy in a block will be implemented soon.
 
 ## How to compile
 First clone the project:

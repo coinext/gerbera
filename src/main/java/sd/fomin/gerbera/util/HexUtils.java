@@ -4,7 +4,7 @@ public class HexUtils {
 
     private HexUtils() { }
 
-    public static String asString(byte[] bytes) {
+    public static String asString(byte... bytes) {
         StringBuilder result = new StringBuilder();
 
         for ( int i = 0; i < bytes.length; i++) {

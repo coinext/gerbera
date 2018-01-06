@@ -25,7 +25,7 @@ class Output {
         this.type = type;
     }
 
-    byte[] serializeForSign() {
+    byte[] serializeForSigHash() {
         ByteBuffer serialized = new ByteBuffer();
 
         serialized.append(ULong.of(satoshi).asLitEndBytes());

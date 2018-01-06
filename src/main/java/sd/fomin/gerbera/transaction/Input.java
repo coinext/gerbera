@@ -7,6 +7,7 @@ import sd.fomin.gerbera.util.ByteBuffer;
 import sd.fomin.gerbera.crypto.PrivateKey;
 import sd.fomin.gerbera.types.UInt;
 import sd.fomin.gerbera.types.VarInt;
+import sd.fomin.gerbera.util.HashUtils;
 import sd.fomin.gerbera.util.HexUtils;
 
 class Input {
@@ -23,6 +24,8 @@ class Input {
 
     private PrivateKey privateKey;
 
+    private boolean segWit;
+
     Input(String transaction, int index, String lock, long satoshi) {
         this.transaction = transaction;
         this.index = index;
@@ -31,46 +34,19 @@ class Input {
         validate();
     }
 
-    byte[] serializeForSign(boolean includeLockingScript) {
-        ByteBuffer serialized = new ByteBuffer();
-
-        serialized.append(getTransactionHashBytesLitEnd());
-        serialized.append(UInt.of(index).asLitEndBytes());
-
-        if (includeLockingScript) {
-            byte[] lockBytes = HexUtils.asBytes(lock);
-            serialized.append(VarInt.of(lockBytes.length).asLitEndBytes());
-            serialized.append(lockBytes);
-        } else {
-            serialized.append(VarInt.of(0).asLitEndBytes());
-        }
-
-        serialized.append(SEQUENCE.asLitEndBytes());
-
-        return serialized.bytes();
-    }
-
     void setPrivateKey(boolean mainNet, String wif) {
         privateKey = PrivateKey.ofWif(mainNet, wif);
     }
 
-    void fillTransaction(byte[] signBase, Transaction transaction) {
-        transaction.addLine("   Input");
+    void fillTransaction(byte[] sigHash, Transaction transaction) {
+        transaction.addLine(segWit ? "   Input (Segwit)" : "   Input");
 
-        byte[] unlocking = unlocking(signBase);
+        byte[] unlocking = segWit ? createUnlockSegwit() : createUnlockRegular(sigHash);
         transaction.addLine("      Transaction out", HexUtils.asString(getTransactionHashBytesLitEnd()));
         transaction.addLine("      Tout index", UInt.of(index).toString());
         transaction.addLine("      Unlock length", HexUtils.asString(VarInt.of(unlocking.length).asLitEndBytes()));
         transaction.addLine("      Unlock", HexUtils.asString(unlocking));
         transaction.addLine("      Sequence", SEQUENCE.toString());
-    }
-
-    boolean hasPrivateKey() {
-        return privateKey != null;
-    }
-
-    long getSatoshi() {
-        return satoshi;
     }
 
     private void validate() {
@@ -92,42 +68,116 @@ class Input {
     private void validateLockingScript() {
         byte[] lockBytes = HexUtils.asBytes(lock);
 
-        if (lockBytes[0] != OpCodes.DUP
-                || lockBytes[1] != OpCodes.HASH160
-                || lockBytes[lockBytes.length - 2] != OpCodes.EQUALVERIFY
-                || lockBytes[lockBytes.length - 1] != OpCodes.CHECKSIG) {
-            throw new IllegalArgumentException("Provided closing script is not P2PKH [" + lock + "]");
-        }
-
-        OpSize pubKeyHashSize = OpSize.ofByte(lockBytes[2]);
-        if (pubKeyHashSize.getSize() != lockBytes.length - 5) {
-            throw new IllegalArgumentException("Incorrect PKH size. " +
-                    "Expected: " + pubKeyHashSize.getSize() +
-                    ". [" + lock + "]");
+        if (lockBytes[0] == OpCodes.DUP
+                && lockBytes[1] == OpCodes.HASH160
+                && lockBytes[lockBytes.length - 2] == OpCodes.EQUALVERIFY
+                && lockBytes[lockBytes.length - 1] == OpCodes.CHECKSIG) {
+            OpSize pubKeyHashSize = OpSize.ofByte(lockBytes[2]);
+            if (pubKeyHashSize.getSize() != lockBytes.length - 5) {
+                throw new IllegalArgumentException("Incorrect PKH size. " +
+                        "Expected: " + pubKeyHashSize.getSize() +
+                        ". [" + lock + "]");
+            }
+            segWit = false;
+        } else if (lockBytes[0] == OpCodes.HASH160
+                && lockBytes[lockBytes.length - 1] == OpCodes.EQUAL) {
+            OpSize pubKeyHashSize = OpSize.ofByte(lockBytes[1]);
+            if (pubKeyHashSize.getSize() != lockBytes.length - 3) {
+                throw new IllegalArgumentException("Incorrect redeemScript size. " +
+                        "Expected: " + pubKeyHashSize.getSize() +
+                        ". [" + lock + "]");
+            }
+            segWit = true;
+        } else {
+            throw new IllegalArgumentException("Provided locking script is not P2PKH or P2SH [" + lock + "]");
         }
     }
 
-    private byte[] unlocking(byte[] signBase) {
+    private byte[] createUnlockRegular(byte[] sigHash) {
         if (privateKey == null) {
             throw new IllegalStateException(
                     "No WIF provided for input [" + transaction + ", " + index + "]");
         }
 
-        ByteBuffer unlocking = new ByteBuffer();
+        ByteBuffer result = new ByteBuffer();
 
-        unlocking.append(privateKey.sign(signBase));
-        unlocking.append(SigHashType.ALL.asByte());
+        result.append(privateKey.sign(sigHash));
+        result.append(SigHashType.ALL.asByte());
 
-        unlocking.putFirst(OpSize.ofInt(unlocking.size()).getSize());
+        result.putFirst(OpSize.ofInt(result.size()).getSize());
 
         byte[] publicKey = privateKey.getPublicKey();
-        unlocking.append(OpSize.ofInt(publicKey.length).getSize());
-        unlocking.append(publicKey);
+        result.append(OpSize.ofInt(publicKey.length).getSize());
+        result.append(publicKey);
 
-        return unlocking.bytes();
+        return result.bytes();
     }
 
-    private byte[] getTransactionHashBytesLitEnd() {
+    private byte[] createUnlockSegwit() {
+        if (privateKey == null) {
+            throw new IllegalStateException(
+                    "No WIF provided for input [" + transaction + ", " + index + "]");
+        }
+
+        ByteBuffer result = new ByteBuffer();
+
+        result.append(OpCodes.FALSE);
+        result.append((byte) 0x14); //ripemd160 size
+        result.append(HashUtils.ripemd160(HashUtils.sha256(privateKey.getPublicKey())));
+        result.putFirst(OpSize.ofInt(result.size()).getSize()); //PUSH DATA
+
+        return result.bytes();
+    }
+
+    byte[] getWitness(byte[] sigHash) {
+        ByteBuffer result = new ByteBuffer();
+        if (segWit) {
+            result.append((byte) 0x02);
+
+            ByteBuffer sign = new ByteBuffer(privateKey.sign(sigHash));
+            sign.append(SigHashType.ALL.asByte());
+            result.append(OpSize.ofInt(sign.size()).getSize());
+            result.append(sign.bytes());
+
+            byte[] pubKey = privateKey.getPublicKey();
+            result.append(OpSize.ofInt(pubKey.length).getSize());
+            result.append(pubKey);
+        } else {
+            result.append((byte) 0x00);
+        }
+
+        return result.bytes();
+    }
+
+    byte[] getTransactionHashBytesLitEnd() {
         return new ByteBuffer(HexUtils.asBytes(transaction)).bytesReversed();
+    }
+
+    boolean hasPrivateKey() {
+        return privateKey != null;
+    }
+
+    long getSatoshi() {
+        return satoshi;
+    }
+
+    boolean isSegWit() {
+        return segWit;
+    }
+
+    UInt getSequence() {
+        return SEQUENCE;
+    }
+
+    PrivateKey getPrivateKey() {
+        return privateKey;
+    }
+
+    int getIndex() {
+        return index;
+    }
+
+    String getLock() {
+        return lock;
     }
 }
