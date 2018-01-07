@@ -10,6 +10,10 @@ public class Transaction {
 
     private long fee;
 
+    private int realSize;
+
+    private int newSize;
+
     public String getRawTransaction() {
         return raw.toString();
     }
@@ -21,9 +25,9 @@ public class Transaction {
     public String getTransactionInfo() {
         StringBuilder info = new StringBuilder();
 
-        int size = raw.length() / 2;
+        int size = (int) Math.ceil((newSize * 3 + realSize) / 4.0);
         info
-                .append("Size (bytes):")
+                .append((realSize == newSize ? "" : "Virtual ") + "Size (bytes):")
                 .append("\n  " )
                 .append(size)
                 .append("\n");
@@ -38,7 +42,15 @@ public class Transaction {
         return info.toString();
     };
 
-    void addLine(String name, String value) {
+    void addData(String name, String value) {
+        addData(name, value, true);
+    }
+
+    void addData(String name, String value, boolean countSize) {
+        int dataSize = value.length() / 2;
+        realSize += dataSize;
+        newSize += countSize ? dataSize : 0;
+
         raw.append(value);
 
         split.append(aligned(name));
@@ -46,7 +58,7 @@ public class Transaction {
         split.append("\n");
     }
 
-    void addLine(String name) {
+    void addHeader(String name) {
         split.append(name);
         split.append("\n");
     }

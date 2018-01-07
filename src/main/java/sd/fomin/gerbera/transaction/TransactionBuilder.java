@@ -89,13 +89,13 @@ public class TransactionBuilder {
         boolean buildSegWitTransaction = inputs.stream().anyMatch(i -> i.isSegWit());
 
         Transaction transaction = new Transaction();
-        transaction.addLine("Version", VERSION.toString());
+        transaction.addData("Version", VERSION.toString());
         if (buildSegWitTransaction) {
-            transaction.addLine("Marker", HexUtils.asString(SEGWIT_MARKER));
-            transaction.addLine("Flag", HexUtils.asString(SEGWIT_FLAG));
+            transaction.addData("Marker", HexUtils.asString(SEGWIT_MARKER), false);
+            transaction.addData("Flag", HexUtils.asString(SEGWIT_FLAG), false);
         }
 
-        transaction.addLine("Input count", VarInt.of(inputs.size()).toString());
+        transaction.addData("Input count", VarInt.of(inputs.size()).toString());
         List<byte[]> witnesses = new LinkedList<>();
         for (int i = 0; i < inputs.size(); i++) {
             byte[] sigHash = getSigHash(i);
@@ -105,17 +105,17 @@ public class TransactionBuilder {
             }
         }
 
-        transaction.addLine("Output count", VarInt.of(outputs.size()).toString());
+        transaction.addData("Output count", VarInt.of(outputs.size()).toString());
         outputs.forEach(output -> output.fillTransaction(transaction));
 
         if (buildSegWitTransaction) {
-            transaction.addLine("Witnesses");
+            transaction.addHeader("Witnesses");
             witnesses.forEach(w ->
-                    transaction.addLine("   Witness", HexUtils.asString(w))
+                    transaction.addData("   Witness", HexUtils.asString(w), false)
             );
         }
 
-        transaction.addLine("Locktime", LOCK_TIME.toString());
+        transaction.addData("Locktime", LOCK_TIME.toString());
 
         transaction.setFee(fee);
 

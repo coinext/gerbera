@@ -16,9 +16,6 @@ Generated transaction hex may be later broadcast via online services (e.g. [Bloc
     * MainNet
     * TestNet
 
-## Next to implement
-* Correct size calculation for SegWit transactions
-
 ## Code examples
 ### Build multiple-outputs transaction
 
@@ -181,9 +178,13 @@ Size (bytes):
 Fee (satoshi/byte):
   10.274
 ```
-
-It is important to note, that for Segwit transactions, the size is regular transactions size.
-Showing size SegWit transactions occupy in a block will be implemented soon.
+For SegWit transactions, fee-per-byte is calculated based on vertual size:
+```
+Virtual Size (bytes):
+  292
+Fee (satoshi/byte):
+  10.274
+```
 
 ## How to compile
 First clone the project:

@@ -39,14 +39,14 @@ class Input {
     }
 
     void fillTransaction(byte[] sigHash, Transaction transaction) {
-        transaction.addLine(segWit ? "   Input (Segwit)" : "   Input");
+        transaction.addHeader(segWit ? "   Input (Segwit)" : "   Input");
 
         byte[] unlocking = segWit ? createUnlockSegwit() : createUnlockRegular(sigHash);
-        transaction.addLine("      Transaction out", HexUtils.asString(getTransactionHashBytesLitEnd()));
-        transaction.addLine("      Tout index", UInt.of(index).toString());
-        transaction.addLine("      Unlock length", HexUtils.asString(VarInt.of(unlocking.length).asLitEndBytes()));
-        transaction.addLine("      Unlock", HexUtils.asString(unlocking));
-        transaction.addLine("      Sequence", SEQUENCE.toString());
+        transaction.addData("      Transaction out", HexUtils.asString(getTransactionHashBytesLitEnd()));
+        transaction.addData("      Tout index", UInt.of(index).toString());
+        transaction.addData("      Unlock length", HexUtils.asString(VarInt.of(unlocking.length).asLitEndBytes()));
+        transaction.addData("      Unlock", HexUtils.asString(unlocking));
+        transaction.addData("      Sequence", SEQUENCE.toString());
     }
 
     private void validate() {

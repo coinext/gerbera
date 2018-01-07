@@ -37,11 +37,11 @@ class Output {
     }
 
     void fillTransaction(Transaction transaction) {
-        transaction.addLine("   Output (" + type.getDesc() + ")");
+        transaction.addHeader("   Output (" + type.getDesc() + ")");
 
-        transaction.addLine("      Satoshi", ULong.of(satoshi).toString());
-        transaction.addLine("      Lock length", VarInt.of(lockingScript.length).toString());
-        transaction.addLine("      Lock", HexUtils.asString(lockingScript));
+        transaction.addData("      Satoshi", ULong.of(satoshi).toString());
+        transaction.addData("      Lock length", VarInt.of(lockingScript.length).toString());
+        transaction.addData("      Lock", HexUtils.asString(lockingScript));
     }
 
     private byte[] getLockingScript(boolean mainNet, String destination) {
