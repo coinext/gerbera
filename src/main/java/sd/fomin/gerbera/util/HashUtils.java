@@ -1,5 +1,7 @@
 package sd.fomin.gerbera.util;
 
+import org.spongycastle.crypto.digests.RIPEMD160Digest;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -16,6 +18,12 @@ public class HashUtils {
     }
 
     public static byte[] ripemd160(byte[] bytes) {
-        return Ripemd160.getHash(bytes);
+        RIPEMD160Digest d = new RIPEMD160Digest();
+        d.update (bytes, 0, bytes.length);
+
+        byte[] result = new byte[d.getDigestSize()];
+        d.doFinal(result, 0);
+
+        return result;
     }
 }
