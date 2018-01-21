@@ -26,16 +26,13 @@ class Input {
 
     private boolean segWit;
 
-    Input(String transaction, int index, String lock, long satoshi) {
+    Input(boolean mainNet, String transaction, int index, String lock, long satoshi, String wif) {
         this.transaction = transaction;
         this.index = index;
         this.lock = lock;
         this.satoshi = satoshi;
+        this.privateKey = PrivateKey.ofWif(mainNet, wif);
         validate();
-    }
-
-    void setPrivateKey(boolean mainNet, String wif) {
-        privateKey = PrivateKey.ofWif(mainNet, wif);
     }
 
     void fillTransaction(byte[] sigHash, Transaction transaction) {

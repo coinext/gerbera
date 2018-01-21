@@ -19,7 +19,7 @@ Generated transaction hex may be later broadcast via online services (e.g. [Bloc
 ## Code examples
 ### Build multiple-outputs transaction
 
-The following is an example of how to build a transaction with one input and two outputs.
+The following is an example of how to build a transaction with one input and three (2 custom and 1 for change) outputs.
 
 ```java
 Transaction transaction = TransactionBuilder.create()
@@ -27,23 +27,21 @@ Transaction transaction = TransactionBuilder.create()
                 "fb8212db8c6c0509d1892115b0a73acfc3c30668a0f51dc80758cc479e29e67e", // from transaction big endian
                 13,                                                                 // from Tout index
                 "76a91491b24bf9f5288532960ac687abb035127b1d28a588ac",               // locking script
-                40404                                                               // satoshi
+                40404,                                                              // satoshi
+                "5HpHagT65TZzG1PH3CSu63k8DbpvD8s5ip4nEB3kEsreAnchuDf"               // WIF
         )
-        .signedWithWif("5HpHagT65TZzG1PH3CSu63k8DbpvD8s5ip4nEB3kEsreAnchuDf")       // WIF for previously added inputs
-        .to("1NZUP3JAc9JkmbvmoTv7nVgZGtyJjirKV1", 17000)                            // output. where and how much (satoshi)   
+        .to("1NZUP3JAc9JkmbvmoTv7nVgZGtyJjirKV1", 17000)                            // output. where and how much (satoshi)
         .to("31h38a54tFMrR8kvVig3R23ntQMoitzkAf", 20000)                            // another output
         .withFee(3000)                                                              // fee (satoshi)
         .changeTo("17Vu7st1U1KwymUKU4jJheHHGRVNqrcfLD")                             // Send change to (if any)
         .build();
 ```
-The `signWithWif()` method applies given private key to all the inputs added after last call of the `signWithWif()` method.
 
 If **(all inputs) - (all outputs) - fee** gives positive value, it will be send to `changeTo` address.
 
 ### Build multiple-inputs transaction
 
-The following is an example of how to build a transaction with three inputs and one output.
-Two inputs use the same private key and the third is different:
+The following is an example of how to build a transaction with three inputs and one output:
 
 ```java
 Transaction transaction = TransactionBuilder.create()
@@ -51,22 +49,23 @@ Transaction transaction = TransactionBuilder.create()
                 "3722df3eff476fe31db8ae2b52806379bde58e9289026d10e425adc25c2e3f03", // from transaction big endian
                 1,                                                                  // from Tout index
                 "76a91491b24bf9f5288532960ac687abb035127b1d28a588ac",               // locking script
-                3000                                                                // satoshi
+                3000,                                                               // satoshi
+                "5HpHagT65TZzG1PH3CSu63k8DbpvD8s5ip4nEB3kEsreAnchuDf"               // WIF
         )
-        .signedWithWif("5HpHagT65TZzG1PH3CSu63k8DbpvD8s5ip4nEB3kEsreAnchuDf")       // WIF for previously added inputs
         .from(
                 "262dc0cba867ba38ec5e92239acbe3074eea3a79105b8e551f60905b1cd79abe", // from transaction big endian
                 2,                                                                  // from Tout index
                 "76a91406afd46bcdfd22ef94ac122aa11f241244a37ecc88ac",               // locking script
-                2500                                                                // satoshi
+                2500,                                                               // satoshi
+                "KwDiBf89QgGbjEhKnhXJuH7LrciVrZi3qYjgd9M7rFU74NMTptX4"              // WIF
         )
         .from(
                 "8b109e31552b7bd3a9c41a30c739eeb0ab90a6ffc92f5a9471e0874acd75e5ba", // from transaction big endian
                 12,                                                                 // from Tout index
                 "76a91406afd46bcdfd22ef94ac122aa11f241244a37ecc88ac",               // locking script
-                10000                                                               // satoshi
+                10000,                                                              // satoshi
+                "KwDiBf89QgGbjEhKnhXJuH7LrciVrZi3qYjgd9M7rFU74NMTptX4"              // WIF
         )
-        .signedWithWif("KwDiBf89QgGbjEhKnhXJuH7LrciVrZi3qYjgd9M7rFU74NMTptX4")      // WIF for previously added inputs
         .to("1NZUP3JAc9JkmbvmoTv7nVgZGtyJjirKV1", 10000)                            // fee (satoshi)
         .withFee(5500)
         .build();

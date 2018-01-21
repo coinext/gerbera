@@ -45,13 +45,8 @@ public class TransactionBuilder {
         return new TransactionBuilder(mainNet);
     }
 
-    public TransactionBuilder from(String fromTransactionBigEnd, int fromToutNumber, String closingScript, long satoshi) {
-        inputs.add(new Input(fromTransactionBigEnd, fromToutNumber, closingScript, satoshi));
-        return this;
-    }
-
-    public TransactionBuilder signedWithWif(String privateKey) {
-        inputs.stream().filter(input -> !input.hasPrivateKey()).forEach(input -> input.setPrivateKey(mainNet, privateKey));
+    public TransactionBuilder from(String fromTransactionBigEnd, int fromToutNumber, String closingScript, long satoshi, String wif) {
+        inputs.add(new Input(mainNet, fromTransactionBigEnd, fromToutNumber, closingScript, satoshi, wif));
         return this;
     }
 

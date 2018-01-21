@@ -12,7 +12,8 @@ public class TransactionInputValidationTest {
                         null,
                         1,
                         "76a914000000000000000000000000000000000000000088ac",
-                        1);
+                        1,
+                        "cV1Qu5Jf9KVaK6AhhJbXptmzjZuCPuWr5o19o9A6WrxhNKhdfCwA");
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -22,7 +23,8 @@ public class TransactionInputValidationTest {
                         "0000000000000000000000000000000000000000000000000000000000000000",
                         -1,
                         "76a914000000000000000000000000000000000000000088ac",
-                        1);
+                        1,
+                        "cV1Qu5Jf9KVaK6AhhJbXptmzjZuCPuWr5o19o9A6WrxhNKhdfCwA");
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -32,7 +34,8 @@ public class TransactionInputValidationTest {
                         "0000000000000000000000000000000000000000000000000000000000000000",
                         1,
                         null,
-                        1);
+                        1,
+                        "cV1Qu5Jf9KVaK6AhhJbXptmzjZuCPuWr5o19o9A6WrxhNKhdfCwA");
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -42,7 +45,8 @@ public class TransactionInputValidationTest {
                         "0000000000000000000000000000000000000000000000000000000000000000",
                         1,
                         "76a914000000000000000000000000000000000000000088ac",
-                        0);
+                        0,
+                        "cV1Qu5Jf9KVaK6AhhJbXptmzjZuCPuWr5o19o9A6WrxhNKhdfCwA");
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -52,7 +56,8 @@ public class TransactionInputValidationTest {
                         "0000000000000000000000000000000000000000000000000000000000000000",
                         1,
                         "76a914000000000000000000000000000000000000000088ac",
-                        -1);
+                        -1,
+                        "cV1Qu5Jf9KVaK6AhhJbXptmzjZuCPuWr5o19o9A6WrxhNKhdfCwA");
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -62,7 +67,8 @@ public class TransactionInputValidationTest {
                         "0000000000000000000000000000000000000000000000000000000000000000",
                         1,
                         "75a914000000000000000000000000000000000000000088ac",
-                        1);
+                        1,
+                        "cV1Qu5Jf9KVaK6AhhJbXptmzjZuCPuWr5o19o9A6WrxhNKhdfCwA");
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -72,7 +78,8 @@ public class TransactionInputValidationTest {
                         "0000000000000000000000000000000000000000000000000000000000000000",
                         1,
                         "76a814000000000000000000000000000000000000000088ac",
-                        1);
+                        1,
+                        "cV1Qu5Jf9KVaK6AhhJbXptmzjZuCPuWr5o19o9A6WrxhNKhdfCwA");
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -82,7 +89,8 @@ public class TransactionInputValidationTest {
                         "0000000000000000000000000000000000000000000000000000000000000000",
                         1,
                         "76a914000000000000000000000000000000000000000087ac",
-                        1);
+                        1,
+                        "cV1Qu5Jf9KVaK6AhhJbXptmzjZuCPuWr5o19o9A6WrxhNKhdfCwA");
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -92,7 +100,8 @@ public class TransactionInputValidationTest {
                         "0000000000000000000000000000000000000000000000000000000000000000",
                         1,
                         "76a914000000000000000000000000000000000000000088ad",
-                        1);
+                        1,
+                        "cV1Qu5Jf9KVaK6AhhJbXptmzjZuCPuWr5o19o9A6WrxhNKhdfCwA");
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -102,7 +111,8 @@ public class TransactionInputValidationTest {
                         "0000000000000000000000000000000000000000000000000000000000000000",
                         1,
                         "76a913000000000000000000000000000000000000000088ac",
-                        1);
+                        1,
+                        "cV1Qu5Jf9KVaK6AhhJbXptmzjZuCPuWr5o19o9A6WrxhNKhdfCwA");
     }
 
 }
