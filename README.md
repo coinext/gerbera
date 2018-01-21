@@ -15,8 +15,11 @@ Generated transaction hex may be later broadcast via online services (e.g. [Bloc
 * Networks
     * MainNet
     * TestNet
+    
+## Help
+* [Where to find unspent outputs to fill TransactionBuilder.from() method arguments](https://github.com/aafomin/gerbera/wiki/Where-to-find-unspent-outputs-to-fill-TransactionBuilder.from()-method-arguments%3F)
 
-## Code examples
+## Quick Code examples
 ### Build multiple-outputs transaction
 
 The following is an example of how to build a transaction with one input and three (2 custom and 1 for change) outputs.
