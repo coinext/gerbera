@@ -13,15 +13,15 @@ import java.util.List;
 
 class Output {
 
-    private long satoshi;
-
-    private byte[] lockingScript;
-
-    private OutputType type;
+    private final boolean mainNet;
+    private final long satoshi;
+    private final String destination;
+    private final OutputType type;
 
     Output(boolean mainNet, long satoshi, String destination, OutputType type) {
+        this.mainNet = mainNet;
         this.satoshi = satoshi;
-        this.lockingScript = getLockingScript(mainNet, destination);
+        this.destination = destination;
         this.type = type;
     }
 
@@ -30,6 +30,7 @@ class Output {
 
         serialized.append(ULong.of(satoshi).asLitEndBytes());
 
+        byte[] lockingScript = getLockingScript(mainNet, destination);
         serialized.append(VarInt.of(lockingScript.length).asLitEndBytes());
         serialized.append(lockingScript);
 
@@ -40,6 +41,7 @@ class Output {
         transaction.addHeader("   Output (" + type.getDesc() + ")");
 
         transaction.addData("      Satoshi", ULong.of(satoshi).toString());
+        byte[] lockingScript = getLockingScript(mainNet, destination);
         transaction.addData("      Lock length", VarInt.of(lockingScript.length).toString());
         transaction.addData("      Lock", HexUtils.asString(lockingScript));
     }
@@ -90,5 +92,10 @@ class Output {
 
     long getSatoshi() {
         return satoshi;
+    }
+
+    @Override
+    public String toString() {
+        return new StringBuilder().append(destination).append(" ").append(satoshi).toString();
     }
 }

@@ -15,15 +15,19 @@ Generated transaction hex may be later broadcast via online services (e.g. [Bloc
 * Networks
     * MainNet
     * TestNet
+* Usage 
+    * As library
+    * Command line application
     
 ## Help
 * [Where to find unspent outputs to fill TransactionBuilder.from() method arguments](https://github.com/aafomin/gerbera/wiki/Where-to-find-unspent-outputs-to-fill-TransactionBuilder.from()-method-arguments%3F)
 
-## Quick Code examples
+## Quick examples
 ### Build multiple-outputs transaction
 
 The following is an example of how to build a transaction with one input and three (2 custom and 1 for change) outputs.
 
+#### As library
 ```java
 Transaction transaction = TransactionBuilder.create()
         .from(
@@ -40,12 +44,23 @@ Transaction transaction = TransactionBuilder.create()
         .build();
 ```
 
+#### Command line tool
+```sh
+$ init mainnet
+$ from fb8212db8c6c0509d1892115b0a73acfc3c30668a0f51dc80758cc479e29e67e 13 76a91491b24bf9f5288532960ac687abb035127b1d28a588ac 40404 5HpHagT65TZzG1PH3CSu63k8DbpvD8s5ip4nEB3kEsreAnchuDf
+$ to 1NZUP3JAc9JkmbvmoTv7nVgZGtyJjirKV1 17000
+$ to 31h38a54tFMrR8kvVig3R23ntQMoitzkAf 20000
+$ withfee 3000
+$ changeto 17Vu7st1U1KwymUKU4jJheHHGRVNqrcfLD
+```
+
 If **(all inputs) - (all outputs) - fee** gives positive value, it will be send to `changeTo` address.
 
 ### Build multiple-inputs transaction
 
 The following is an example of how to build a transaction with three inputs and one output:
 
+#### As library
 ```java
 Transaction transaction = TransactionBuilder.create()
         .from(
@@ -77,9 +92,20 @@ Transaction transaction = TransactionBuilder.create()
 In case change address is not explicitly included (like in this example), but change is present,
 an `Exception` containing change satoshi amount is thrown. Change address must be explicitly declared so that change satoshi are not accidentally spent as fee.
 
+#### Command line tool
+```sh
+$ init mainnet
+$ from 3722df3eff476fe31db8ae2b52806379bde58e9289026d10e425adc25c2e3f03 1  76a91491b24bf9f5288532960ac687abb035127b1d28a588ac 3000  5HpHagT65TZzG1PH3CSu63k8DbpvD8s5ip4nEB3kEsreAnchuDf
+$ from 262dc0cba867ba38ec5e92239acbe3074eea3a79105b8e551f60905b1cd79abe 2  76a91406afd46bcdfd22ef94ac122aa11f241244a37ecc88ac 2500  KwDiBf89QgGbjEhKnhXJuH7LrciVrZi3qYjgd9M7rFU74NMTptX4
+$ from 8b109e31552b7bd3a9c41a30c739eeb0ab90a6ffc92f5a9471e0874acd75e5ba 12 76a91406afd46bcdfd22ef94ac122aa11f241244a37ecc88ac 10000 KwDiBf89QgGbjEhKnhXJuH7LrciVrZi3qYjgd9M7rFU74NMTptX4
+$ withfee 5500
+$ to 1NZUP3JAc9JkmbvmoTv7nVgZGtyJjirKV1 10000
+```
+
 Transaction may contain multiple inputs and multiple outputs at the same time.
 
 ### Build transaction for TestNet
+#### As library
 
 To build a TestNet transaction, create a `TransactionBulder` with `false` argument (`true` is for MainNet, which is default)
 ```java
@@ -89,15 +115,29 @@ Transaction transaction = TransactionBuilder.create(false)
         ...
         .build();
 ```
+
+#### Command line tool
+
+```sh
+$ init testnet
+```
+
 Note that in TestNet, addresses and WIFs have different prefixes.
 
 ### Get transaction hex
+#### As library
 
 The built transaction object may be used to get raw transaction hex:
 ```java
 transaction.getRawTransaction()
 ```
 The output is a `String` that may be submitted to an online service to broadcast the built transaction.
+
+#### Command line tool
+
+```sh
+$ raw
+```
 
 Result example:
 ```
@@ -106,11 +146,18 @@ Result example:
 
 
 ### Get transaction field-split representation
+#### As library
 
 The transaction object may be also used to get field-split hex transaction representation that makes reading raw hex easier.
 ```java
 transaction.getSplitTransaction()
 ``` 
+
+#### Command line tool
+
+```sh
+$ split
+```
 
 Result example:
 ```
@@ -168,10 +215,18 @@ Locktime                 00000000
 ```
 
 ### Get additional transaction information
+#### As library
+
 To get additional transaction info (size in bytes and satoshi/byte fee) call the following method of the `transaction` object:
 ```java
 transaction.getTransactionInfo()
 ``` 
+
+#### Command line tool
+
+```sh
+$ info
+```
 
 Result example:
 ```
@@ -201,4 +256,10 @@ $ ./gradlew build
 The jar `gerbera-VERSION.jar` will appear in `./build/libs/`
 
 ## How to use
+#### As library
 Add the built jar to your project and start from `sd.fomin.gerbera.transaction.TransactionBuilder` class.
+
+#### Command line tool
+```sh
+$ java -jar path_to_build_jar/gerbera-VERSION.jar
+```

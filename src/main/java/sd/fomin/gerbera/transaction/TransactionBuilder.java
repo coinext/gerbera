@@ -2,6 +2,7 @@ package sd.fomin.gerbera.transaction;
 
 import sd.fomin.gerbera.constant.OpCodes;
 import sd.fomin.gerbera.constant.SigHashType;
+import sd.fomin.gerbera.crypto.PrivateKey;
 import sd.fomin.gerbera.types.OpSize;
 import sd.fomin.gerbera.types.ULong;
 import sd.fomin.gerbera.util.ByteBuffer;
@@ -23,13 +24,12 @@ public class TransactionBuilder {
     private static final byte SEGWIT_FLAG = (byte) 0x01;
     private static final UInt LOCK_TIME = UInt.of(0);
 
-    private boolean mainNet;
+    private final boolean mainNet;
 
-    private List<Input> inputs = new LinkedList<>();
-    private List<Output> outputs = new LinkedList<>();
+    private final List<Input> inputs = new LinkedList<>();
+    private final List<Output> outputs = new LinkedList<>();
 
     private String changeAddress;
-
     private long fee;
     private long donate;
 
@@ -71,14 +71,24 @@ public class TransactionBuilder {
     }
 
     public Transaction build() {
+        if (inputs.isEmpty()) {
+            throw new IllegalStateException("Transaction must contain at least one input");
+        }
+
+        List<Output> buildOutputs = new LinkedList<>(outputs);
+
         if (donate > 0) {
             String donateAddress = mainNet ? DONATE_ADDRESS_MAINNET : DONATE_ADDRESS_TESTNET;
-            outputs.add(new Output(mainNet, donate, donateAddress, OutputType.DONATE));
+            buildOutputs.add(new Output(mainNet, donate, donateAddress, OutputType.DONATE));
         }
 
         long change = getChange();
         if (change > 0) {
-            outputs.add(new Output(mainNet, change, changeAddress, OutputType.CHANGE));
+            buildOutputs.add(new Output(mainNet, change, changeAddress, OutputType.CHANGE));
+        }
+
+        if (buildOutputs.isEmpty()) {
+            throw new IllegalStateException("Transaction must contain at least one output");
         }
 
         boolean buildSegWitTransaction = inputs.stream().anyMatch(i -> i.isSegWit());
@@ -93,15 +103,15 @@ public class TransactionBuilder {
         transaction.addData("Input count", VarInt.of(inputs.size()).toString());
         List<byte[]> witnesses = new LinkedList<>();
         for (int i = 0; i < inputs.size(); i++) {
-            byte[] sigHash = getSigHash(i);
+            byte[] sigHash = getSigHash(buildOutputs, i);
             inputs.get(i).fillTransaction(sigHash, transaction);
             if (buildSegWitTransaction) {
                 witnesses.add(inputs.get(i).getWitness(sigHash));
             }
         }
 
-        transaction.addData("Output count", VarInt.of(outputs.size()).toString());
-        outputs.forEach(output -> output.fillTransaction(transaction));
+        transaction.addData("Output count", VarInt.of(buildOutputs.size()).toString());
+        buildOutputs.forEach(output -> output.fillTransaction(transaction));
 
         if (buildSegWitTransaction) {
             transaction.addHeader("Witnesses");
@@ -117,14 +127,14 @@ public class TransactionBuilder {
         return transaction;
     }
 
-    private byte[] getSigHash(int signedIndex) {
+    private byte[] getSigHash(List<Output> buildOutputs, int signedIndex) {
         ByteBuffer signBase = new ByteBuffer();
 
         signBase.append(VERSION.asLitEndBytes());
         if (inputs.get(signedIndex).isSegWit()) {
-            signBase.append(getSegwitPreimage(signedIndex));
+            signBase.append(getSegwitPreimage(buildOutputs, signedIndex));
         } else {
-            signBase.append(getRegularPreimage(signedIndex));
+            signBase.append(getRegularPreimage(buildOutputs, signedIndex));
         }
         signBase.append(LOCK_TIME.asLitEndBytes());
         signBase.append(SigHashType.ALL.asLitEndBytes());
@@ -132,7 +142,7 @@ public class TransactionBuilder {
         return HashUtils.sha256(HashUtils.sha256(signBase.bytes()));
     }
 
-    private byte[] getRegularPreimage(int signedIndex) {
+    private byte[] getRegularPreimage(List<Output> buildOutputs, int signedIndex) {
         ByteBuffer result = new ByteBuffer();
 
         result.append(VarInt.of(inputs.size()).asLitEndBytes());
@@ -152,13 +162,13 @@ public class TransactionBuilder {
             result.append(input.getSequence().asLitEndBytes());
         }
 
-        result.append(VarInt.of(outputs.size()).asLitEndBytes());
-        outputs.stream().map(Output::serializeForSigHash).forEach(result::append);
+        result.append(VarInt.of(buildOutputs.size()).asLitEndBytes());
+        buildOutputs.stream().map(Output::serializeForSigHash).forEach(result::append);
 
         return result.bytes();
     }
 
-    private byte[] getSegwitPreimage(int signedIndex) {
+    private byte[] getSegwitPreimage(List<Output> buildOutputs, int signedIndex) {
         ByteBuffer result = new ByteBuffer();
         Input currentInput = inputs.get(signedIndex);
 
@@ -179,7 +189,8 @@ public class TransactionBuilder {
         result.append(currentInput.getTransactionHashBytesLitEnd()); //outpoint
         result.append(UInt.of(currentInput.getIndex()).asLitEndBytes());
 
-        byte[] pkh = HashUtils.ripemd160(HashUtils.sha256(currentInput.getPrivateKey().getPublicKey())); //scriptCode
+        PrivateKey privateKey = PrivateKey.ofWif(mainNet, currentInput.getWif());
+        byte[] pkh = HashUtils.ripemd160(HashUtils.sha256(privateKey.getPublicKey())); //scriptCode
         ByteBuffer scriptCode = new ByteBuffer(OpCodes.DUP, OpCodes.HASH160, (byte) 0x14);
         scriptCode.append(pkh);
         scriptCode.append(OpCodes.EQUALVERIFY, OpCodes.CHECKSIG);
@@ -191,7 +202,7 @@ public class TransactionBuilder {
         result.append(currentInput.getSequence().asLitEndBytes()); //sequence
 
         ByteBuffer outs = new ByteBuffer(); //hash outs
-        outputs.stream().map(Output::serializeForSigHash).forEach(outs::append);
+        buildOutputs.stream().map(Output::serializeForSigHash).forEach(outs::append);
         result.append(HashUtils.sha256(HashUtils.sha256(outs.bytes())));
 
         return result.bytes();
@@ -212,5 +223,36 @@ public class TransactionBuilder {
         }
 
         return change;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder result = new StringBuilder();
+
+        result.append("Network: ").append(mainNet ? "MainNet" : "TestNet");
+        if (inputs.size() > 0) {
+            result.append("\nInputs: ").append(inputs.size());
+            inputs.forEach(i -> {
+                result.append("\n   ").append(i);
+            });
+        }
+        if (outputs.size() > 0) {
+            result.append("\nOutputs: ").append(outputs.size());
+            outputs.forEach(o -> {
+                result.append("\n   ").append(o);
+            });
+        }
+        if (changeAddress != null) {
+            result.append("\nChange to: ").append(changeAddress);
+        }
+        if (fee > 0) {
+            result.append("\nFee: ").append(fee);
+        }
+        if (donate > 0) {
+            result.append("\nDonate: ").append(donate);
+        }
+        result.append("\n");
+
+        return result.toString();
     }
 }
